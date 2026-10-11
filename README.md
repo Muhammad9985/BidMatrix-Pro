@@ -40,30 +40,30 @@ flowchart TD
     end
 
     subgraph EXTRACTION ["2. Hybrid Extraction & Neural OCR"]
-        STEP2 --> E{Document Type?}
-        E -- Vector / Digital PDF --> F[Native Fast Text Stream Extractor]
-        E -- Scanned / Image PDF --> G[High-Speed Neural OCR Engine<br/>RapidOCR / PyPDFium2]
-        F --> H[Item Parser & Arithmetic Verification]
+        STEP2 --> E{"Document Type?"}
+        E -- "Vector / Digital PDF" --> F["Native Fast Text Stream Extractor"]
+        E -- "Scanned / Image PDF" --> G["High-Speed Neural OCR Engine<br/>RapidOCR / PyPDFium2"]
+        F --> H["Item Parser & Arithmetic Verification"]
         G --> H
     end
 
     subgraph MAPPING ["3. Automatic Item Catalog Creation"]
-        H --> I[Auto-Extract Code, Description, Qty, UOM]
-        I --> J[Arithmetic Cross-Check: Rate x Qty == Total]
-        J --> K[(Embedded SQLite Local Database)]
+        H --> I["Auto-Extract Code, Description, Qty, UOM"]
+        I --> J["Arithmetic Cross-Check: Rate x Qty == Total"]
+        J --> K[("Embedded SQLite Local Database")]
     end
 
     subgraph EVALUATION ["4. Deterministic Ranking Engine"]
-        K --> L[Group by Item Code across all Bidders]
-        L --> M[Lowest Price Wins: Rank 1 L1 ★]
-        M --> N[Incremental Ranks: 2nd, 3rd, 4th]
-        N --> O[5% Bid Security Compliance Audit]
+        K --> L["Group by Item Code across all Bidders"]
+        L --> M["Lowest Price Wins: Rank 1 L1 ★"]
+        M --> N["Incremental Ranks: 2nd, 3rd, 4th"]
+        N --> O["5% Bid Security Compliance Audit"]
     end
 
     subgraph OUTPUT ["5. Executive UI & Export"]
-        O --> P[🖥️ Native Desktop Comparative Data Grid]
-        P --> Q[📊 KPI Metrics & UOM Conflict Alerts]
-        P --> R[📥 1-Click CSV & Excel Export]
+        O --> P["🖥️ Native Desktop Comparative Data Grid"]
+        P --> Q["📊 KPI Metrics & UOM Conflict Alerts"]
+        P --> R["📥 1-Click CSV & Excel Export"]
     end
 
     style INGESTION fill:#EBF5FB,stroke:#2980B9,stroke-width:2px;
@@ -80,29 +80,29 @@ flowchart TD
 ```mermaid
 graph TB
     subgraph PRESENTATION ["Presentation Layer (PyQt6 Native Desktop - Windows x64)"]
-        UI_DASH[Executive KPI Dashboard - 5 Summary Cards]
-        UI_INGEST[Two-Step Ingestion: Choose PDFs -> ⚡ Process]
-        UI_FILTER[Multi-Criteria Filter & UOM Conflict Toolbar]
-        UI_GRID[9-Column Comparative Statement Data Grid]
-        UI_AUDIT[5% Bid Security & Arithmetic Audit Dialog]
+        UI_DASH["Executive KPI Dashboard - 5 Summary Cards"]
+        UI_INGEST["Two-Step Ingestion: Choose PDFs -> ⚡ Process"]
+        UI_FILTER["Multi-Criteria Filter & UOM Conflict Toolbar"]
+        UI_GRID["9-Column Comparative Statement Data Grid"]
+        UI_AUDIT["5% Bid Security & Arithmetic Audit Dialog"]
     end
 
     subgraph CONTROLLER ["UI Controllers & Event Bus"]
-        SIGNALS[PyQt6 PySide Signals & Slots Architecture]
-        PROGRESS_SIG[Real-time Parsing Progress Reporter]
+        SIGNALS["PyQt6 PySide Signals & Slots Architecture"]
+        PROGRESS_SIG["Real-time Parsing Progress Reporter"]
     end
 
     subgraph CORE_SERVICES ["Core Engine Services (Background QThread Isolates)"]
-        PDF_PARSER[Dual-Engine PDF Parser: Vector + PyPDFium2]
-        OCR_ENGINE[Local Neural OCR Engine<br/>RapidOCR / ONNX Runtime Native]
-        VALIDATOR[Sanity & Arithmetic Verification Engine]
-        RANK_CALC[Deterministic Bid Ranking Algorithm (L1, L2, L3...)]
-        EXPORTER[Excel & CSV Exporter (OpenPyXL / CSV)]
+        PDF_PARSER["Dual-Engine PDF Parser: Vector + PyPDFium2"]
+        OCR_ENGINE["Local Neural OCR Engine<br/>RapidOCR / ONNX Runtime Native"]
+        VALIDATOR["Sanity & Arithmetic Verification Engine"]
+        RANK_CALC["Deterministic Bid Ranking Algorithm (L1, L2, L3...)"]
+        EXPORTER["Excel & CSV Exporter (OpenPyXL / CSV)"]
     end
 
     subgraph PERSISTENCE ["Data Persistence Layer"]
-        DB[(Local Embedded SQLite 3 Database)]
-        SCHEMA[(Normalized Tender & Bid Comparative Schema)]
+        DB[("Local Embedded SQLite 3 Database")]
+        SCHEMA[("Normalized Tender & Bid Comparative Schema")]
     end
 
     PRESENTATION <--> CONTROLLER
@@ -184,16 +184,16 @@ The software evaluates every item independently across all participating firms.
 
 ```mermaid
 flowchart LR
-    Start([Item Prize Evaluation]) --> Group[Group All Bids by Item Code]
-    Group --> Filter[Filter Valid Bids<br/>Rate > 0 and Not Disqualified]
-    Filter --> Sort[Sort by Unit Price Ascending]
-    Sort --> RankAssign[Assign Rank 1 to Lowest Rate]
-    RankAssign --> CheckTie{Tie Detected?<br/>Same Unit Price}
-    CheckTie -- Yes --> TieRule[Assign Same Rank e.g., 1st<br/>Flag Tie for Committee]
-    CheckTie -- No --> NextRank[Assign Incremental Ranks<br/>2nd, 3rd, 4th]
-    TieRule --> Save[Persist to Comparative Statement]
+    Start(["Item Price Evaluation"]) --> Group["Group All Bids by Item Code"]
+    Group --> Filter["Filter Valid Bids<br/>Rate > 0 and Not Disqualified"]
+    Filter --> Sort["Sort by Unit Price Ascending"]
+    Sort --> RankAssign["Assign Rank 1 to Lowest Rate"]
+    RankAssign --> CheckTie{"Tie Detected?<br/>Same Unit Price"}
+    CheckTie -- "Yes" --> TieRule["Assign Same Rank e.g., 1st<br/>Flag Tie for Committee"]
+    CheckTie -- "No" --> NextRank["Assign Incremental Ranks<br/>2nd, 3rd, 4th"]
+    TieRule --> Save["Persist to Comparative Statement"]
     NextRank --> Save
-    Save --> Summary[Update Best Bidder Award Analytics]
+    Save --> Summary["Update Best Bidder Award Analytics"]
 
     style Start fill:#E8EAF6,stroke:#3F51B5
     style RankAssign fill:#C8E6C9,stroke:#2E7D32,stroke-width:2px
@@ -224,8 +224,8 @@ flowchart TD
 
     subgraph ENGINE ["Filter & Normalization Engine"]
         F1{"User Filter Applied?"}
-        F1 -- No Filter (Default) --> DEF["Automatic Lowest Unit Price Ranking (L1, L2, L3...)"]
-        F1 -- Custom Criteria --> FIL["Apply Multi-Criteria Rule:"]
+        F1 -- "No Filter (Default)" --> DEF["Automatic Lowest Unit Price Ranking (L1, L2, L3...)"]
+        F1 -- "Custom Criteria" --> FIL["Apply Multi-Criteria Rule:"]
         FIL --> C1["• Filter by Specific UOM (e.g. Only 'Box' or Only 'Sheet')"]
         FIL --> C2["• UOM Unit-Cost Normalization (Convert Box rate to Per-Sheet rate)"]
         FIL --> C3["• Filter by Specific Firm(s) or Price Threshold"]
@@ -411,24 +411,37 @@ python desktop_app.py
 
 ```mermaid
 gantt
-    title BidMatrix Pro Implementation Schedule
+    title BidMatrix Pro Implementation Roadmap
     dateFormat  YYYY-MM-DD
-    section Phase 1: Foundation
-    Database Schema & SQLite Engine       :done,    des1, 2026-10-11, 2d
-    Master BOQ Optional Importer           :done,    des2, 2026-10-11, 2d
-    section Phase 2: PDF & OCR
-    Digital PDF Extraction Service         :done,    des3, 2026-10-11, 3d
-    Scanned OCR Preprocessing Pipeline     :done,    des4, 2026-10-11, 3d
-    Data Harmonization & Regex Matcher     :done,    des5, 2026-10-11, 2d
-    section Phase 3: Core Logic
-    Ranking & Tie-Breaking Engine (L1-L4)  :done,    des6, 2026-10-11, 2d
-    Bid Security (5%) & Arithmetic Audit   :done,    des7, 2026-10-11, 2d
-    section Phase 4: UI & Desktop Polish
-    PyQt6 Native Desktop Dashboard         :done,    des8, 2026-10-11, 3d
-    Two-Step Ingestion & Filter Toolbar    :done,    des9, 2026-10-11, 2d
-    CSV / Excel Export with 9-Column FCS   :done,    des10, 2026-10-11, 2d
-    End-to-End Tender Audit Verification  :done,    des11, 2026-10-11, 2d
+    axisFormat  %b %d
+
+    section Phase 1 - Foundation
+    Database Schema & SQLite Engine          :done, des1, 2026-10-01, 2026-10-03
+    Master BOQ Catalog Support (Optional)    :done, des2, after des1, 2d
+
+    section Phase 2 - PDF & Neural OCR
+    Digital PDF Extraction Service           :done, des3, after des2, 3d
+    Neural OCR Pipeline for Scanned Quotes   :done, des4, after des3, 3d
+    Text Harmonization & Regex Matcher       :done, des5, after des4, 2d
+
+    section Phase 3 - Core Logic
+    Deterministic Bid Ranking Engine L1-L4   :done, des6, after des5, 2d
+    Five Percent Bid Security Audit Engine   :done, des7, after des6, 2d
+
+    section Phase 4 - Native Desktop UI
+    PyQt6 Native Windows Executive Grid      :done, des8, after des7, 3d
+    Multi-Criteria Filter & UOM Toolbar      :done, des9, after des8, 2d
+    Excel & CSV Comparative Exporter         :done, des10, after des9, 2d
+    End-to-End Tender Audit Verification     :done, des11, after des10, 2d
 ```
+
+| Phase | Milestone | Deliverable | Status |
+|:---:|---|---|:---:|
+| **1** | **Data Foundation** | SQLite 3 Relational Tender & Quotation Schema | ✅ Completed |
+| **2** | **Extraction & OCR** | Vector text extraction & RapidOCR neural pipeline for scanned PDFs | ✅ Completed |
+| **3** | **Evaluation Engine** | Deterministic item-level ranking ($L_1, L_2, L_3 \dots$) & 5% Security Audit | ✅ Completed |
+| **4** | **Native Desktop UI** | PyQt6 Windows Desktop GUI with 2-step ingestion & live filter toolbar | ✅ Completed |
+| **5** | **Export & Compliance** | 9-Column Comparative Statement CSV / Excel export | ✅ Completed |
 
 ---
 
