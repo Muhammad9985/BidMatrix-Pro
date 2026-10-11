@@ -1,8 +1,8 @@
 # 🚀 BidMatrix Pro — Automated Tender Quotation Evaluation & Best-Bidder Selection System
 ### High-Performance Desktop Software for Automated Procurement Comparative Statements (FCS)
 
-[![Platform](https://img.shields.io/badge/Platform-Windows%20Desktop-0078D6?logo=windows&logoColor=white)](https://flutter.dev/desktop)
-[![Framework](https://img.shields.io/badge/Framework-Flutter%203.x-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
+[![Platform](https://img.shields.io/badge/Platform-Windows%2010%20%2F%2011%20Native%20Desktop-0078D6?logo=windows&logoColor=white)](desktop_app.py)
+[![GUI](https://img.shields.io/badge/GUI-Native%20PyQt6%20%2F%20Qt%20Desktop-41CD52?logo=qt&logoColor=white)](desktop_app.py)
 [![Engine](https://img.shields.io/badge/OCR%20Engine-RapidOCR%20%7C%20WinRT%20Native-00A86B)](#3-hybrid-pdf-extraction--ocr-engine)
 [![Standards](https://img.shields.io/badge/Compliance-SPPRA%20%2F%20PPRA%20Rules-FF6F00)](#7-audit-integrity--compliance)
 [![Database](https://img.shields.io/badge/Database-SQLite%203%20%28Embedded%29-003B57?logo=sqlite&logoColor=white)](#5-database-schema--architecture)
@@ -18,7 +18,12 @@ Manual entry from scanned PDF quotations into Excel leads to:
 2. **Delayed Comparative Statements (FCS)** taking days to compile.
 3. **Audit Vulnerabilities** during bid-security verification and lowest-bidder evaluations.
 
-**BidMatrix Pro** solves this by providing a **super-fast, automated desktop software** that ingests multi-vendor PDF quotations (both digital and scanned), extracts pricing and specifications using a local AI-powered OCR pipeline, maps them against master BOQ items, calculates automatic item-level rankings ($L_1, L_2, L_3 \dots$), and exports audit-ready, 100% Excel-compatible Financial Comparative Statements.
+**BidMatrix Pro** solves this by providing a **super-fast, native Windows desktop software** that ingests multi-vendor PDF quotations (both digital and scanned), extracts pricing and specifications using a local AI-powered OCR pipeline, maps them across tender items, calculates automatic item-level rankings ($L_1, L_2, L_3 \dots$), and exports audit-ready, 100% Excel-compatible Financial Comparative Statements.
+
+> [!TIP]
+> **What is a BOQ (Bill of Quantities) & Is it Required?**
+> A BOQ is the official tender item list published by the procuring agency (e.g., hospital or government authority).
+> **In BidMatrix Pro, a separate BOQ file is COMPLETELY OPTIONAL.** You do **NOT** need a separate BOQ file to run comparisons. The software's AI extraction engine automatically builds the master item catalog, codes, descriptions, and quantities directly from your uploaded vendor quotation PDFs!
 
 ---
 
@@ -26,38 +31,39 @@ Manual entry from scanned PDF quotations into Excel leads to:
 
 ```mermaid
 flowchart TD
-    subgraph INGESTION ["1. Ingestion Phase"]
-        A[📁 Tender Master BOQ<br/>Excel / CSV Template] --> D[Core Processing Queue]
-        B[📄 Vendor A PDF Quote<br/>Digital Text PDF] --> D
-        C[📑 Vendor B & C PDF Quotes<br/>Scanned CamScanner PDFs] --> D
+    subgraph INGESTION ["1. Ingestion Phase (Simple 2-Step Workflow)"]
+        STEP1["Step 1: Choose Multi-Vendor PDF Quotations<br/>(Digital text or scanned CamScanner PDFs)"]
+        BOQ_OPT["Optional: Import Master BOQ Template<br/>(Not required - auto-extracted from PDFs)"]
+        STEP2["Step 2: Click ⚡ PROCESS QUOTATIONS & SEE RESULTS"]
+        STEP1 --> STEP2
+        BOQ_OPT -.-> STEP2
     end
 
-    subgraph EXTRACTION ["2. Hybrid Extraction & OCR Engine"]
-        D --> E{Document Type?}
-        E -- Vector / Text PDF --> F[Fast Native Text Stream Extractor]
-        E -- Scanned Image / Raster --> G[High-Speed Neural OCR Engine<br/>RapidOCR / WinRT]
-        F --> H[Regex & Token Boundary Normalizer]
+    subgraph EXTRACTION ["2. Hybrid Extraction & Neural OCR"]
+        STEP2 --> E{Document Type?}
+        E -- Vector / Digital PDF --> F[Native Fast Text Stream Extractor]
+        E -- Scanned / Image PDF --> G[High-Speed Neural OCR Engine<br/>RapidOCR / PyPDFium2]
+        F --> H[Item Parser & Arithmetic Verification]
         G --> H
     end
 
-    subgraph MAPPING ["3. Smart Item Matching & Validation"]
-        H --> I[BOQ Item Code Matcher<br/>Pri0001, Pri0002...]
-        I --> J[Quantity & UOM Sanity Check]
-        J --> K[Arithmetic Verification<br/>Unit Price x Qty == Total Price]
-        K --> L[(Embedded SQLite Database)]
+    subgraph MAPPING ["3. Automatic Item Catalog Creation"]
+        H --> I[Auto-Extract Code, Description, Qty, UOM]
+        I --> J[Arithmetic Cross-Check: Rate x Qty == Total]
+        J --> K[(Embedded SQLite Local Database)]
     end
 
-    subgraph EVALUATION ["4. Ranking & Comparative Engine"]
-        L --> M[Item-by-Item Price Sorting]
-        M --> N[Lowest Price Detection: Rank 1 L1]
-        N --> O[Equal Price Tie-Breaking Logic]
-        O --> P[Bid Security 5% Compliance Verification]
+    subgraph EVALUATION ["4. Deterministic Ranking Engine"]
+        K --> L[Group by Item Code across all Bidders]
+        L --> M[Lowest Price Wins: Rank 1 L1 ★]
+        M --> N[Incremental Ranks: 2nd, 3rd, 4th]
+        N --> O[5% Bid Security Compliance Audit]
     end
 
     subgraph OUTPUT ["5. Executive UI & Export"]
-        P --> Q[🖥️ Real-Time Interactive Data Grid]
-        Q --> R[📊 Executive Summary Dashboard]
-        Q --> S[📥 1-Click CSV & Excel Export<br/>Matching SMBBIT FCS Standard]
+        O --> P[🖥️ Native Desktop Comparative Data Grid]
+        P --> Q[📊 KPI Metrics & UOM Conflict Alerts]
+        P --> R[📥 1-Click CSV & Excel Export]
     end
 
     style INGESTION fill:#EBF5FB,stroke:#2980B9,stroke-width:2px;
@@ -73,38 +79,38 @@ flowchart TD
 
 ```mermaid
 graph TB
-    subgraph PRESENTATION ["Presentation Layer (Flutter Desktop - Windows x64)"]
-        UI_DASH[Executive KPI Dashboard]
-        UI_UPLOAD[Drag & Drop Multi-PDF Ingestion Zone]
-        UI_VERIFY[Data Verification & Correction Modal]
-        UI_GRID[High-Performance Comparative Data Table]
-        UI_FILTER[Multi-Column Filtering & Global Search]
+    subgraph PRESENTATION ["Presentation Layer (PyQt6 Native Desktop - Windows x64)"]
+        UI_DASH[Executive KPI Dashboard - 5 Summary Cards]
+        UI_INGEST[Two-Step Ingestion: Choose PDFs -> ⚡ Process]
+        UI_FILTER[Multi-Criteria Filter & UOM Conflict Toolbar]
+        UI_GRID[9-Column Comparative Statement Data Grid]
+        UI_AUDIT[5% Bid Security & Arithmetic Audit Dialog]
     end
 
-    subgraph STATE ["State Management & Controllers"]
-        BLOC[Quotation Bloc / Riverpod Providers]
-        EVENT_BUS[Async Event Stream & Progress Notifier]
+    subgraph CONTROLLER ["UI Controllers & Event Bus"]
+        SIGNALS[PyQt6 PySide Signals & Slots Architecture]
+        PROGRESS_SIG[Real-time Parsing Progress Reporter]
     end
 
-    subgraph CORE_SERVICES ["Core Engine Services (Background Isolates)"]
-        PDF_PARSER[PDF Parsing Service]
-        OCR_ENGINE[Local OCR Engine<br/>ONNX Runtime / WinRT Native]
-        VALIDATOR[Sanity & Calculation Validator]
-        RANK_CALC[Deterministic Bid Ranking Algorithm]
-        EXPORTER[CSV / Excel OpenPyXL Engine]
+    subgraph CORE_SERVICES ["Core Engine Services (Background QThread Isolates)"]
+        PDF_PARSER[Dual-Engine PDF Parser: Vector + PyPDFium2]
+        OCR_ENGINE[Local Neural OCR Engine<br/>RapidOCR / ONNX Runtime Native]
+        VALIDATOR[Sanity & Arithmetic Verification Engine]
+        RANK_CALC[Deterministic Bid Ranking Algorithm (L1, L2, L3...)]
+        EXPORTER[Excel & CSV Exporter (OpenPyXL / CSV)]
     end
 
     subgraph PERSISTENCE ["Data Persistence Layer"]
-        DB[(Local SQLite Database)]
-        AUDIT_LOG[(Append-Only Audit Trail)]
+        DB[(Local Embedded SQLite 3 Database)]
+        SCHEMA[(Normalized Tender & Bid Comparative Schema)]
     end
 
-    PRESENTATION <--> STATE
-    STATE <--> CORE_SERVICES
+    PRESENTATION <--> CONTROLLER
+    CONTROLLER <--> CORE_SERVICES
     CORE_SERVICES <--> PERSISTENCE
 
     style PRESENTATION fill:#E8F8F5,stroke:#16A085,stroke-width:2px;
-    style STATE fill:#EBF5FB,stroke:#3498DB,stroke-width:2px;
+    style CONTROLLER fill:#EBF5FB,stroke:#3498DB,stroke-width:2px;
     style CORE_SERVICES fill:#FEF5E7,stroke:#E67E22,stroke-width:2px;
     style PERSISTENCE fill:#F5EEF8,stroke:#9B59B6,stroke-width:2px;
 ```
@@ -121,28 +127,30 @@ Vendors submit quotations in varying formats: some generate crystal-clear digita
 sequenceDiagram
     autonumber
     actor User as Procurement Officer
-    participant UI as Flutter Desktop UI
-    participant Worker as Background Isolate
-    participant Extractor as Text Extractor (pypdf/native)
-    participant OCR as OCR Subsystem (RapidOCR/WinRT)
+    participant UI as PyQt6 Desktop Window
+    participant Worker as Background QThread Worker
+    participant Extractor as Text Extractor (pypdf/pypdfium2)
+    participant OCR as Neural OCR (RapidOCR ONNX)
     participant DB as SQLite Storage
 
-    User->>UI: Drop 4 Vendor PDFs (Ettihad, Prince, Haq, ZS)
-    UI->>Worker: Dispatch PDF files
-    loop For Each PDF
-        Worker->>Extractor: Probe Page Stream for Text Layer
-        alt Text layer found (>= 80% confidence)
-            Extractor-->>Worker: Stream extracted structured tokens
-        else Scanned / Raster image detected
-            Worker->>OCR: Render Page Image (300 DPI)
-            OCR-->>Worker: Return Bounding Boxes & Confidence Text
+    User->>UI: Select Vendor PDFs (Ettihad, Prince, Haq, ZS)
+    User->>UI: Click ⚡ PROCESS QUOTATIONS & SEE RESULTS
+    UI->>Worker: Launch extraction in background thread
+    loop For Each Vendor PDF
+        Worker->>Extractor: Scan Page Text Stream
+        alt Digital Text Present (Vector PDF)
+            Extractor-->>Worker: Extract Item Codes, Descriptions, Quantities, Rates
+        else Scanned / Mobile App Image (CamScanner)
+            Worker->>OCR: High-Res Render (300 DPI) & OCR Token Recognition
+            OCR-->>Worker: Return Bounding Boxes & Text Tokens
         end
-        Worker->>Worker: Parse Item Code, Description, Qty, Rate, Total
-        Worker->>Worker: Reconcile Arithmetic (Qty * Rate)
-        Worker->>DB: Insert Clean Tender Line Items
-        Worker-->>UI: Update Progress Bar (e.g. 75% complete)
+        Worker->>Worker: Reconcile Arithmetic (Qty * Unit Rate == Total)
+        Worker->>DB: Upsert Master Items & Vendor Quotation Records
+        Worker-->>UI: Emit progress update signal (e.g. 50%, 75%, 100%)
     end
-    UI->>User: Display Complete Comparative Statement with L1 Highlighted
+    Worker-->>UI: Ingestion Complete Signal
+    UI->>DB: Query Evaluated Rankings & Best Bidder (L1) Badges
+    UI->>User: Render 9-Column Comparative Grid with Emerald ★ 1st Badges
 ```
 
 ### Key Technical Safeguards:
@@ -317,42 +325,45 @@ erDiagram
 
 ## 🖥️ UI/UX Design Specifications (Modern Light Theme)
 
-The UI is built with Flutter Desktop following modern, ergonomic enterprise guidelines:
+The UI is built as a **100% Native Windows Desktop Application** using PyQt6 / Qt6, following ergonomic enterprise design standards:
 
 ```
-+----------------------------------------------------------------------------------------------------------------------+
-|  ⚡ BidMatrix Pro  |  Tender Ref: PROC/SMBBIT/(PP-01)/2026-27  |  EPADS: S-26090824871              [⚙ Settings] [Help]  |
-+----------------------------------------------------------------------------------------------------------------------+
-|  [📁 Import BOQ]  [📄 Upload Vendor PDFs]  [⚡ Run Auto-Analysis]  [📥 Export Excel / CSV]      [ Search Item / Firm... ]|
-+----------------------------------------------------------------------------------------------------------------------+
-|  DASHBOARD METRICS:                                                                                                  |
-|  [ 90 Total Items ]    [ 4 Participating Bidders ]    [ 271 Quoted Bids ]    [ 12 Committee Awarded ]    [ 1 Alert ] |
-+----------------------------------------------------------------------------------------------------------------------+
-|  COMPARATIVE EVALUATION GRID (FCS View):                                                                             |
-|  Filter by: [ All Items v ]  [ Lowest Bidders Only v ]  [ Show Disqualified Firms [x] ]                              |
-|                                                                                                                      |
-|  Code     | Item Description            | Qty    | UOM   | Firm Name               | Quoted Spec    | Rate   | Total  | Rank |
-|  ---------+-----------------------------+--------+-------+-------------------------+----------------+--------+--------+------|
-|  Pri0002  | White Confidential Medical  | 20,000 | Nos.  | M/s. Prince Enterprises | 350 GSM Bleach |  50.00 | 1.00M  | 1st★ |
-|  Pri0002  | White Confidential Medical  | 20,000 | Nos.  | M/s. Haq Enterprises    | 300 GSM Bleach |  54.00 | 1.08M  | 2nd  |
-|  Pri0002  | White Confidential Medical  | 20,000 | Nos.  | M/s. Ettihad Traders    | Bleach Card    |  43.80 | 876.0K | Disq |
-|  ---------+-----------------------------+--------+-------+-------------------------+----------------+--------+--------+------|
-|  Pri0003  | Physician Order Sheet       | 90,000 | Sheet | M/s. Prince Enterprises | 70 GSM Local   |   2.38 | 214.2K | 1st★ |
-|  Pri0003  | Physician Order Sheet       | 90,000 | Sheet | M/s. Haq Enterprises    | 68 GSM Form    |   2.50 | 225.0K | 2nd  |
-|  Pri0003  | Physician Order Sheet       | 90,000 | Sheet | M/s. Z.S Traders        | Standard Paper |   5.20 | 468.0K | 3rd  |
-+----------------------------------------------------------------------------------------------------------------------+
-|  STATUS BAR: Ready | SQLite Database Synced | All 4 PDF Quotations Processed in 4.2s | Audit Log: 0 Mismatches Unresolved   |
-+----------------------------------------------------------------------------------------------------------------------+
++------------------------------------------------------------------------------------------------------------------------------------------+
+|  ⚡ BidMatrix Pro — Automated Tender Quotation Evaluation System  |  Tender Ref: PROC/SMBBIT/(PP-01)/2026-27  | EPADS: S-26090824871    |
++------------------------------------------------------------------------------------------------------------------------------------------+
+|  [ + Choose PDF Quotations ]   [ ⚡ PROCESS QUOTATIONS & SEE RESULTS ]   [ 📋 Optional: Import BOQ ]   [ 🗑️ Clear All ]   [ 📥 Export CSV ] |
+|  Selected: 4 quotation PDFs ready for ingestion                                 [ Progress: [====================================] 100% ]|
++------------------------------------------------------------------------------------------------------------------------------------------+
+|  EXECUTIVE KPI DASHBOARD:                                                                                                                |
+|  [ 📦 Total Items: 90 ]  [ 🏢 Bidders: 4 ]  [ 📝 Quoted Bids: 271 ]  [ 🏆 Rank 1 Awards: 45 ]  [ 🛡️ 5% Bid Security: Audit Details ]     |
++------------------------------------------------------------------------------------------------------------------------------------------+
+|  ADVANCED FILTER & NORMALIZATION TOOLBAR:                                                                                                |
+|  [ 🔍 Search Item / Code / Firm... ]  [ Firm: All Bidders v ]  [ UOM: All v ]  [ Rank: All v ]  [⚠️ Show Different UOM Quoted Only [ ]]   |
++------------------------------------------------------------------------------------------------------------------------------------------+
+|  COMPARATIVE EVALUATION GRID (FCS View - 9 Columns matching Excel Benchmark):                                                           |
+|                                                                                                                                          |
+|  Code     | Item Description            | Tentative Qty | UOM   | Firm Name               | Quoted Description | Unit Price | Total Price | Rank  |
+|  ---------+-----------------------------+---------------+-------+-------------------------+--------------------+------------+-------------+-------|
+|  Pri0002  | White Confidential Medical  | 20,000        | Nos.  | M/s. Prince Enterprises | 350 GSM Bleach     |      50.00 |  1,000,000  | ★ 1st |
+|  Pri0002  | White Confidential Medical  | 20,000        | Nos.  | M/s. Haq Enterprises    | 300 GSM Bleach     |      54.00 |  1,080,000  | 2nd   |
+|  Pri0002  | White Confidential Medical  | 20,000        | Nos.  | M/s. Ettihad Traders    | Bleach Card        |      43.80 |    876,000  | Disq  |
+|  ---------+-----------------------------+---------------+-------+-------------------------+--------------------+------------+-------------+-------|
+|  Pri0003  | Physician Order Sheet       | 90,000        | Sheet | M/s. Prince Enterprises | 70 GSM Local       |       2.38 |    214,200  | ★ 1st |
+|  Pri0003  | Physician Order Sheet       | 90,000        | Sheet | M/s. Haq Enterprises    | 68 GSM Form        |       2.50 |    225,000  | 2nd   |
+|  Pri0003  | Physician Order Sheet       | 90,000        | Sheet | M/s. Z.S Traders        | Standard Paper     |       5.20 |    468,000  | 3rd   |
++------------------------------------------------------------------------------------------------------------------------------------------+
+|  STATUS: Ready | Database Synced (bidmatrix_procurement.db) | 271 Quotation Records Loaded | 5% Security Verified | Offline & Air-Gapped|
++------------------------------------------------------------------------------------------------------------------------------------------+
 ```
 
 ### Color Palette Tokens:
 - **Primary Canvas**: `#F8FAFC` (Slate Ultra Light)
 - **Card & Grid Surface**: `#FFFFFF` (Pure White with subtle `#E2E8F0` borders)
 - **Primary Brand / Action**: `#0284C7` (Sky Blue 600)
-- **Winner / Rank 1 Highlight**: `#DCFCE7` (Emerald Soft Green) with `#15803D` text & gold star badge `★`
+- **Winner / Rank 1 Highlight**: `#DCFCE7` (Emerald Soft Green) with `#15803D` text & gold star badge `★ 1st`
 - **Runner Up (Rank 2)**: `#F1F5F9` (Slate 100)
 - **Disqualification / Warning**: `#FEE2E2` (Rose Soft Red) with `#B91C1C` alert indicator
-- **Typography**: Inter / Outfit modern sans-serif typography for maximum numerical legibility.
+- **Typography**: Segoe UI / Inter modern sans-serif typography for maximum numerical legibility.
 
 ---
 
@@ -360,11 +371,39 @@ The UI is built with Flutter Desktop following modern, ergonomic enterprise guid
 
 | Layer | Component | Selected Technology | Rationale |
 |---|---|---|---|
-| **Frontend UI** | Desktop Framework | **Flutter Desktop (Windows C++)** | Native 60 FPS, multi-window support, pixel-perfect rendering |
-| **Local Storage** | Database Engine | **SQLite 3 (`sqflite_common_ffi`)** | Zero configuration, self-contained, lightning fast ACID transactions |
-| **PDF Extraction** | Vector Text Stream | **`syncfusion_flutter_pdf` / `pdfx`** | High-fidelity coordinate extraction for digital text PDFs |
-| **OCR Pipeline** | Scanned PDF Parser | **Embedded High-Speed ONNX Engine** | Instant page-level OCR on Windows without cloud latency |
-| **Export Engine** | Comparative Exporter | **`csv` & `excel` / `openpyxl`** | 100% formatting fidelity matching standard institutional templates |
+| **Desktop GUI** | Native Window Framework | **PyQt6 (Qt 6.11 x64 Native)** | 100% native Windows window, 0 browser dependencies, no symlink issues |
+| **Local Storage** | Database Engine | **SQLite 3 (`sqlite3` Embedded)** | Zero configuration, self-contained, lightning fast ACID transactions |
+| **PDF Extraction** | Vector & Stream Engine | **`pypdf` & `pypdfium2`** | High-fidelity coordinate extraction for digital text PDFs |
+| **OCR Pipeline** | Scanned PDF Parser | **`rapidocr-onnxruntime` Neural OCR** | Embedded high-speed OCR on Windows without cloud latency or API keys |
+| **Export Engine** | Comparative Exporter | **Standard CSV & `openpyxl`** | 100% formatting fidelity matching standard institutional templates |
+| **Windows Runner** | Instant Launcher | **`Launch_BidMatrix_Desktop.bat`** | Double-click instant execution on Windows 10 / 11 |
+
+---
+
+## 🚀 Quick Start / How to Run
+
+### Method 1: One-Click Desktop Launcher
+Simply double-click the included batch script in the project root:
+```cmd
+Launch_BidMatrix_Desktop.bat
+```
+
+### Method 2: Command Line (PowerShell or CMD)
+Ensure Python 3.10+ is installed, then run:
+```bash
+python desktop_app.py
+```
+
+### 📖 Step-by-Step User Guide for Procurement Officers:
+1. **Choose PDFs**: Click **`+ Choose PDF Quotations`** and select all vendor quotation PDFs for the tender.
+2. **Process**: Click the prominent **`⚡ PROCESS QUOTATIONS & SEE RESULTS`** button. The software parses all vendor quotes, extracts item codes, descriptions, quantities, and rates, saves them to SQLite, and computes lowest-bidder ranks automatically.
+3. **Optional BOQ**: A separate BOQ file is **NOT** needed because the software extracts all items directly from vendor quotes. If you have an institutional BOQ template, click **`📋 Optional: Import BOQ`**.
+4. **Filter & Inspect**:
+   - Filter by **Firm** to inspect a specific vendor's full submission.
+   - Filter by **Rank** (e.g. choose `1st (Lowest Bidder Only)` to see only winning line items).
+   - Check **`⚠️ Show Different UOM Quoted Only`** to immediately detect items where vendors quoted conflicting packaging (e.g., Box vs Sheet).
+5. **Bid Security Audit**: Click the **`🛡️ 5% Bid Security Compliance`** KPI card to view the exact Pay Order vs required 5% guarantee audit table.
+6. **Export**: Click **`📥 Export CSV`** to export the entire 9-column comparative statement ready for signing and archiving.
 
 ---
 
@@ -376,21 +415,23 @@ gantt
     dateFormat  YYYY-MM-DD
     section Phase 1: Foundation
     Database Schema & SQLite Engine       :done,    des1, 2026-10-11, 2d
-    Master BOQ Template Importer           :active,  des2, after des1, 2d
+    Master BOQ Optional Importer           :done,    des2, 2026-10-11, 2d
     section Phase 2: PDF & OCR
-    Digital PDF Extraction Service         :         des3, after des2, 3d
-    Scanned OCR Preprocessing Pipeline     :         des4, after des3, 3d
-    Data Harmonization & Regex Matcher     :         des5, after des4, 2d
+    Digital PDF Extraction Service         :done,    des3, 2026-10-11, 3d
+    Scanned OCR Preprocessing Pipeline     :done,    des4, 2026-10-11, 3d
+    Data Harmonization & Regex Matcher     :done,    des5, 2026-10-11, 2d
     section Phase 3: Core Logic
-    Ranking & Tie-Breaking Engine          :         des6, after des5, 2d
-    Bid Security & Sanity Checker          :         des7, after des6, 2d
+    Ranking & Tie-Breaking Engine (L1-L4)  :done,    des6, 2026-10-11, 2d
+    Bid Security (5%) & Arithmetic Audit   :done,    des7, 2026-10-11, 2d
     section Phase 4: UI & Desktop Polish
-    Responsive Grid & Executive Dashboard  :         des8, after des7, 3d
-    CSV / Excel Export with 9-Column FCS   :         des9, after des8, 2d
-    End-to-End Tender Audit Verification  :         des10, after des9, 2d
+    PyQt6 Native Desktop Dashboard         :done,    des8, 2026-10-11, 3d
+    Two-Step Ingestion & Filter Toolbar    :done,    des9, 2026-10-11, 2d
+    CSV / Excel Export with 9-Column FCS   :done,    des10, 2026-10-11, 2d
+    End-to-End Tender Audit Verification  :done,    des11, 2026-10-11, 2d
 ```
 
 ---
 
 ## ⚖️ Audit Integrity & Compliance Notice
 This software is engineered to assist Procurement Committees, Evaluation Officers, and Finance Directors in assembling Financial Comparative Statements in compliance with Public Procurement Regulatory Frameworks. All extracted records, OCR tokens, and ranking determinations maintain full, verifiable traceability to the original uploaded PDF documents.
+
