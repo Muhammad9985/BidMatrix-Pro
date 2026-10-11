@@ -201,6 +201,50 @@ flowchart LR
 
 ---
 
+## 🎛️ Advanced Multi-Criteria Filtering & UOM Normalization
+
+In real-world tenders, vendors occasionally quote items in different Units of Measurement (e.g., one vendor quotes per **Box of 2,000**, another per **Sheet** or **Pad of 100 Pages**). 
+
+**BidMatrix Pro** provides an **Intelligent Filter & Normalization Engine**:
+
+```mermaid
+flowchart TD
+    subgraph INPUT ["Quotation Stream"]
+        Q1["Vendor A: PKR 9,200 / Box (2000 units)"]
+        Q2["Vendor B: PKR 4.60 / Sheet (Per unit)"]
+    end
+
+    subgraph ENGINE ["Filter & Normalization Engine"]
+        F1{"User Filter Applied?"}
+        F1 -- No Filter (Default) --> DEF["Automatic Lowest Unit Price Ranking (L1, L2, L3...)"]
+        F1 -- Custom Criteria --> FIL["Apply Multi-Criteria Rule:"]
+        FIL --> C1["• Filter by Specific UOM (e.g. Only 'Box' or Only 'Sheet')"]
+        FIL --> C2["• UOM Unit-Cost Normalization (Convert Box rate to Per-Sheet rate)"]
+        FIL --> C3["• Filter by Specific Firm(s) or Price Threshold"]
+        FIL --> C4["• Filter by Awarded / Shortlisted / Disqualified Status"]
+    end
+
+    subgraph RESULT ["Dynamic Real-Time Re-Ranking"]
+        DEF --> RES["Recalculate Table & Instant Visual L1 Highlight"]
+        C1 --> RES
+        C2 --> RES
+        C3 --> RES
+        C4 --> RES
+    end
+
+    style INPUT fill:#EBF5FB,stroke:#2980B9
+    style ENGINE fill:#FEF9E7,stroke:#F39C12
+    style RESULT fill:#EAFAF1,stroke:#27AE60
+```
+
+### Filtering Capabilities:
+1. **Default Auto-Ranking**: If no filter is active, the engine automatically sorts and ranks all bidders by lowest unit price across every single line item ($L_1, L_2, L_3 \dots$).
+2. **UOM Conflict Isolation**: Instantly filter items where vendors quoted differing UOMs (e.g., `Box` vs `Pad` vs `Sheet`) so the procurement officer can examine unit parity.
+3. **UOM Unit-Rate Normalization**: Toggle between *As-Quoted Unit Price* and *Normalized Per-Piece Unit Rate* to ensure apples-to-apples evaluation.
+4. **Multi-Field Instant Search & Filter**: Filter by Firm Name, Item Code, Price Range, Ranking (`1st` only, `2nd`, etc.), or Approval Status with instant sub-millisecond response.
+
+---
+
 ## 🗄️ Database Schema (SQLite)
 
 ```mermaid
